@@ -1,0 +1,36 @@
+<!doctype html>
+<html>
+<head><meta charset="utf-8"><title>Mint NFT</title></head>
+<body>
+<h1>Mint a SimpleNFT</h1>
+<button id="connect">Connect Wallet</button>
+<button id="mint">Mint</button>
+<script>
+const contractAddress = 'REPLACE_WITH_DEPLOYED_ADDRESS';
+const abi = [ /* minimal ABI for mint() */ {"inputs":[],"name":"mint","outputs":[{"internalType":"uint256","name":"","type":"uint256"}],"stateMutability":"nonpayable","type":"function"} ];
+
+
+let provider;
+document.getElementById('connect').onclick = async () => {
+if (window.ethereum) {
+provider = window.ethereum;
+await provider.request({ method: 'eth_requestAccounts' });
+alert('Connected');
+} else alert('Install MetaMask');
+}
+
+
+document.getElementById('mint').onclick = async () => {
+if (!provider) return alert('Connect first');
+const web3 = new window.Web3(provider);
+const contract = new web3.eth.Contract(abi, contractAddress);
+const accounts = await web3.eth.getAccounts();
+contract.methods.mint().send({ from: accounts[0]})
+.on('transactionHash', h=>console.log('tx',h))
+.on('receipt', r=>alert('Minted!'))
+.on('error', e=>console.error(e));
+}
+</script>
+<script src="https://cdn.jsdelivr.net/npm/web3@1.8.0/dist/web3.min.js"></script>
+</body>
+</html>
